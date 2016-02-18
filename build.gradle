@@ -1,0 +1,47 @@
+plugins {
+  id 'java'
+  id 'eclipse'
+  id 'com.github.johnrengelman.shadow' version '1.2.2'
+}
+
+defaultTasks 'clean', 'shadowJar'
+version '1.0-SNAPSHOT'
+buildDir 'build/gradle'
+
+ext {
+  buildTime = new Date().format('yyyy-MM-dd HH:mm:ss')
+}
+
+eclipse {
+  classpath {
+    defaultOutputDir = file('build/eclipse')
+    downloadSources = true
+    downloadJavadoc = false
+  }
+}
+tasks.eclipse.dependsOn(tasks.cleanEclipse, tasks.clean)
+
+repositories { mavenCentral() }
+
+dependencies {
+  compile 'org.apache.commons:commons-lang3:3.4'
+  compile 'commons-io:commons-io:2.4'
+
+  compile 'org.apache.pdfbox:fontbox:1.8.11'
+  compile 'org.apache.pdfbox:pdfbox:1.8.11'
+
+  compile 'joda-time:joda-time:2.9.2'
+}
+
+configurations.all.each { it.transitive = false }
+
+jar {
+  manifest {
+    attributes (
+        'Main-Class': 'pti.Main',
+        'Implementation-Title': project.name,
+        'Implementation-Version': project.version,
+        'Build-Time': buildTime
+        )
+  }
+}
